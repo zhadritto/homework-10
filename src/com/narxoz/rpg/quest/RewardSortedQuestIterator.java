@@ -1,14 +1,15 @@
 package com.narxoz.rpg.quest;
 
+import java.util.ArrayList;
 import java.util.List;
-
-public class OrderedQuestIterator implements QuestIterator {
+public class RewardSortedQuestIterator implements QuestIterator {
 
     private final List<Quest> snapshot;
     private int cursor;
 
-    public OrderedQuestIterator(QuestLog questLog) {
-        this.snapshot = questLog.snapshot();
+    public RewardSortedQuestIterator(QuestLog questLog) {
+        this.snapshot = new ArrayList<>(questLog.snapshot());
+        this.snapshot.sort((q1, q2) -> Integer.compare(q2.getRewardGold(), q1.getRewardGold()));
         this.cursor = 0;
     }
 
