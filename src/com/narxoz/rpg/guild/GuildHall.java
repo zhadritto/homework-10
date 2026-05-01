@@ -5,21 +5,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Topic-based mediator for the Adventurers' Guild war council.
- */
 public class GuildHall implements GuildMediator {
 
     private final Map<String, List<GuildMember>> membersByTopic = new HashMap<>();
 
     @Override
     public void register(GuildMember member) {
-        // TODO: add the member to the topic lists it should receive.
+        addSubscriber("ALL", member);
+
+        String role = member.getClass().getSimpleName();
+        switch (role) {
+            case "Captain": addSubscriber("COMMAND", member); break;
+            case "Healer": addSubscriber("MEDICAL", member); break;
+            case "Quartermaster": addSubscriber("SUPPLIES", member); break;
+            case "Scout": addSubscriber("RECON", member); break;
+            case "Loremaster": addSubscriber("LORE", member); break;
+        }
     }
 
     @Override
     public void dispatch(String topic, GuildMember from, String payload) {
-        // TODO: notify registered members for the topic without direct colleague calls.
+        List<GuildMember> subs = subscribersFor(topic);
+        for (GuildMember member : subs) {
+            if (member != from) {
+                member.receive(topic, from, payload);
+            }
+        }
     }
 
     protected void addSubscriber(String topic, GuildMember member) {
